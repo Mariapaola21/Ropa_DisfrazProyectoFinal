@@ -2,47 +2,57 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-
+use Illuminate\Support\Facades\Hash;
+use App\Models\Bloqueo; 
+/**
+ * Modelo de usuario del sistema.
+ * Representa a clientes y administradores (tabla "usuarios").
+ * Contiene la información de inicio de sesión y sus relaciones con reservas y bloqueos.
+ *
+ * @property \Illuminate\Database\Eloquent\Collection|\App\Models\Bloqueo[] $bloqueos
+ * @method \Illuminate\Database\Eloquent\Relations\HasMany bloqueos()
+ */
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
+    // Tabla asociada
+    protected $table = 'usuarios';
+
+    // Campos que se pueden asignar masivamente
     protected $fillable = [
-        'name',
-        'email',
-        'password',
+        'nombre','apellido','documento','correo','password',
+        'telefono','direccion','tipo_usuario',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
+    // Campos que se ocultan en arrays/JSON
+    protected $hidden = ['password','remember_token'];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
+     * Mutador para hashear automáticamente el password
+     * cada vez que se asigne un valor.
      */
-    protected function casts(): array
+    public function setPasswordAttribute($value)
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        $this->attributes['password'] = Hash::needsRehash($value) ? Hash::make($value) : $value;
+    }
+
+    /**
+     * Relación: un usuario puede tener muchas reservas.
+     */
+    public function reservas()
+    {
+        return $this->hasMany(Reserva::class, 'user_id');
+    }
+
+    /**
+     * Relación: un usuario puede tener muchos bloqueos.
+     */
+    public function bloqueos()
+    {
+        return $this->hasMany(Bloqueo::class, 'user_id');
     }
 }

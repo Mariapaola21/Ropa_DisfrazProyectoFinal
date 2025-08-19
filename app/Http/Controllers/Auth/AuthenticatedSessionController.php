@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use Illuminate\Validation\ValidationException;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -22,13 +22,27 @@ class AuthenticatedSessionController extends Controller
     /**
      * Handle an incoming authentication request.
      */
-    public function store(LoginRequest $request): RedirectResponse
+    public function store(Request $request): RedirectResponse
     {
-        $request->authenticate();
+        // 1. Cambiar la validación para que espere el campo 'correo'
+        $request->validate([
+            'correo' => ['required', 'string', 'email'],
+            'password' => ['required', 'string'],
+        ]);
+
+        // 2. Cambiar las credenciales que se pasan al método Auth::attempt
+        $credentials = $request->only('correo', 'password');
+
+        if (! Auth::attempt($credentials, $request->boolean('remember'))) {
+            // 3. Cambiar el mensaje de error para que se muestre en el campo 'correo'
+            throw ValidationException::withMessages([
+                'correo' => trans('auth.failed'),
+            ]);
+        }
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        return redirect()->intended(route('dashboard'));
     }
 
     /**
