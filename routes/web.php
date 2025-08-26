@@ -29,9 +29,7 @@ Route::get('/reserva/historial', [ReservaController::class, 'historial'])
 Route::get('/admin/inventario', [DisfrazController::class, 'inventario'])->name('inventario.index');
 Route::post('/admin/inventario', [DisfrazController::class, 'store'])->name('inventario.store');
 Route::delete('/admin/inventario/{id}', [DisfrazController::class, 'destroy'])->name('inventario.destroy');
-Route::resource('/inventario', DisfrazController::class)->except([
-     'destroy'
-]);
+Route::patch('/admin/inventario/{id}', [DisfrazController::class, 'update'])->name('inventario.update');
 
 
 // --------------------
@@ -44,6 +42,7 @@ Route::middleware('auth')->group(function () {
 
     // Confirmación antes de guardar
 Route::post('/reserva/confirmar', [ReservaController::class, 'confirmar'])->name('Reserva.confirmar');
+Route::post('/reservas', [ReservaController::class, 'store'])->name('Reserva.store');
 
     // Acciones sobre carrito (eliminar / editar item)
     Route::post('/reserva/editar', [ReservaController::class, 'editar'])->name('reserva.editar');
@@ -51,8 +50,6 @@ Route::post('/reserva/confirmar', [ReservaController::class, 'confirmar'])->name
 Route::delete('/reserva/eliminar/{id}', [ReservaController::class, 'eliminarDelCarrito'])->name('carrito.eliminar');
 
 
-    // CRUD de reservas guardadas en BD (sin index porque ya lo definimos arriba)
-    Route::resource('/Reserva', ReservaController::class)->except(['index']);
 
     // Perfil de usuario
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

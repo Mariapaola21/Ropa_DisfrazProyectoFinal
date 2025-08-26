@@ -77,7 +77,7 @@
                                         </div>
                                         <form action="{{ route('inventario.update', $d->id) }}" method="POST" enctype="multipart/form-data">
                                             @csrf
-                                            @method('PUT')
+                                            @method('PATCH')
                                             <input type="text" name="nombre" value="{{ $d->nombre }}" required>
                                             <input type="number" name="precio" value="{{ $d->precio }}" required>
                                             <textarea name="descripcion">{{ $d->descripcion }}</textarea>
