@@ -29,10 +29,9 @@ Route::get('/reserva/historial', [ReservaController::class, 'historial'])
 Route::get('/admin/inventario', [DisfrazController::class, 'inventario'])->name('inventario.index');
 Route::post('/admin/inventario', [DisfrazController::class, 'store'])->name('inventario.store');
 Route::delete('/admin/inventario/{id}', [DisfrazController::class, 'destroy'])->name('inventario.destroy');
-Route::resource('/inventario', DisfrazController::class)->only([
-     'update', 'destroy'
+Route::resource('/inventario', DisfrazController::class)->except([
+     'destroy'
 ]);
-
 
 
 // --------------------
